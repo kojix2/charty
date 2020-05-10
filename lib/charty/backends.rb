@@ -73,6 +73,7 @@ end
 
 require "charty/backends/bokeh"
 require "charty/backends/google_charts"
+require "charty/backends/gr"
 require "charty/backends/gruff"
 require "charty/backends/plotly"
 require "charty/backends/pyplot"
