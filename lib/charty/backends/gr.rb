@@ -1,4 +1,3 @@
-
 module Charty
   module Backends
     class GR
@@ -36,6 +35,28 @@ module Charty
         when :hist
         end
       end
+
+      # ==== NEW PLOTTING API ====
+
+      def begin_figure; end
+
+      def bar; end
+
+      def box_plot; end
+
+      def set_xlabel(label); end
+
+      def set_ylabel(label); end
+
+      def set_xticks(values); end
+
+      def set_xtic_labels(labels); end
+
+      def set_xlim(min, max); end
+
+      def disable_xaxis_grid; end
+
+      def show; end
     end
   end
 end
