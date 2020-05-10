@@ -9,6 +9,10 @@ group :matplotlib do
   gem "matplotlib"
 end
 
+group :gr do
+  gem "ruby-gr"
+ends
+
 group :nmatrix do
   gem "nmatrix"
 end
