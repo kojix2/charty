@@ -7,11 +7,13 @@ module Charty
 
       class << self
         def prepare
-          require 'gr'
+          require 'gr/plot'
         end
       end
 
-      def initialize; end
+      def initialize
+        @GR = ::GR
+      end
 
       def label(x, y); end
 
@@ -19,20 +21,48 @@ module Charty
 
       def render_layout(layout); end
 
-      def render(context, filename); end
+      def render(context, _filename)
+        plot(context)
+      end
 
       def save; end
 
-      def plot(plot, context)
+      def plot(context)
         case context.method
         when :bar
+          if context.series.size > 1
+            raise "I'm sorry. Bar charts for multiple series are not yet possible."
+          end
+
+          @GR.barplot(context.series[0].xs, context.series[0].ys,
+                      title: context.title,
+                      xlabel: context.xlabel,
+                      ylabel: context.ylabel)
         when :barth
         when :box_plot
         when :bubble
         when :curve
+          @GR.plot(*context.series.map { |i| [i.xs, i.ys] },
+                   title: context.title,
+                   xlabel: context.xlabel,
+                   ylabel: context.ylabel,
+                   labels: context.series.map(&:label))
         when :scatter
+          @GR.scatter(*context.series.map { |i| [i.xs, i.ys] },
+                      title: context.title,
+                      xlabel: context.xlabel,
+                      ylabel: context.ylabel)
         when :error_bar
         when :hist
+          if context.data.size > 1
+            if context.data.first.is_a? Array
+              raise "I'm sorry. Bar charts for multiple series are not yet possible."
+            end
+          end
+          @GR.histogram(context.data,
+                        title: context.title,
+                        xlabel: context.xlabel,
+                        ylabel: context.ylabel)
         end
       end
 
