@@ -231,6 +231,7 @@ module Charty
           end
           return :h
         end
+
         case orient
         when :v
           if require_numeric && y_type != :numeric
@@ -264,7 +265,9 @@ module Charty
       private def group_long_form(vals, groups, group_order)
         grouped_vals = vals.group_by(groups)
 
-        plot_data = group_order.map {|g| grouped_vals[g] || [] }
+        plot_data = group_order.map do |g|
+          grouped_vals[g] || Charty::Vector.new([])
+        end
 
         if vals.respond_to?(:name)
           value_label = vals.name
@@ -348,11 +351,15 @@ module Charty
       end
 
       private def annotate_axes(backend)
+        backend.set_title(self.title) if self.title
+
         if orient == :v
           xlabel, ylabel = @group_label, @value_label
         else
           xlabel, ylabel = @value_label, @group_label
         end
+        xlabel = self.x_label if self.x_label
+        ylabel = self.y_label if self.y_label
         backend.set_xlabel(xlabel) unless xlabel.nil?
         backend.set_ylabel(ylabel) unless ylabel.nil?
 

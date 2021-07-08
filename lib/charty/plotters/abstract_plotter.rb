@@ -83,6 +83,24 @@ module Charty
                    end
       end
 
+      attr_reader :x_label
+
+      def x_label=(val)
+        @x_label = check_string(val, :x_label, allow_nil: true)
+      end
+
+      attr_reader :y_label
+
+      def y_label=(val)
+        @y_label = check_string(val, :y_label, allow_nil: true)
+      end
+
+      attr_reader :title
+
+      def title=(val)
+        @title = check_string(val, :title, allow_nil: true)
+      end
+
       private def substitute_options(options)
         options.each do |key, val|
           send("#{key}=", val)
@@ -140,6 +158,27 @@ module Charty
         end
       end
 
+      private def check_string(value, name, allow_nil: false)
+        case value
+        when Symbol
+          value.to_s
+        else
+          if allow_nil && value.nil?
+            nil
+          else
+            orig_value = value
+            value = String.try_convert(value)
+            if value.nil?
+              raise ArgumentError,
+                "`#{name}` must be convertible to String: %p" % orig_value,
+                caller
+            else
+              value
+            end
+          end
+        end
+      end
+
       private def variable_type(vector, boolean_type=:numeric)
         if vector.numeric?
           :numeric
@@ -182,15 +221,6 @@ module Charty
 
         data = processed ? processed_data : plot_data
         data = data.drop_na if drop_na
-
-        levels = var_levels.dup
-
-        ([:x, :y] & grouping_vars).each do |axis|
-          levels[axis] = plot_data[axis].categorical_order()
-          if processed
-            # TODO: perform inverse conversion of axis scaling here
-          end
-        end
 
         if not grouping_vars.empty?
           grouped = data.group_by(grouping_vars, sort: false)

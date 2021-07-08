@@ -662,6 +662,10 @@ module Charty
         end
       end
 
+      def set_title(title)
+        @pyplot.gca.set_title(String(title))
+      end
+
       def set_xlabel(label)
         @pyplot.gca.set_xlabel(String(label))
       end
@@ -692,6 +696,27 @@ module Charty
 
       def set_ylim(min, max)
         @pyplot.gca.set_ylim(Float(min), Float(max))
+      end
+
+      def set_xscale(scale)
+        scale = check_scale_type(scale, :xscale)
+        @pyplot.gca.set_xscale(scale)
+      end
+
+      def set_yscale(scale)
+        scale = check_scale_type(scale, :yscale)
+        @pyplot.gca.set_yscale(scale)
+      end
+
+      private def check_scale_type(val, name)
+        case
+        when :linear, :log
+          val
+        else
+          raise ArgumentError,
+                "Invalid #{name} type: %p" % val,
+                caller
+        end
       end
 
       def disable_xaxis_grid

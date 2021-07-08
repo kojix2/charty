@@ -152,7 +152,8 @@ module Charty
           group_keys = grouper.unique.to_a
           groups = data.groupby(grouper)
           group_keys.map {|g|
-            [g, Charty::Vector.new(groups.get_group(g))]
+            g_vals = groups.get_group(g) rescue []
+            [g, Charty::Vector.new(g_vals)]
           }.to_h
         when Charty::Vector
           case grouper.adapter
@@ -193,6 +194,14 @@ module Charty
       def percentile(q)
         q = q.map {|x| x / 100.0 }
         data.quantile(q)
+      end
+
+      def log_scale(method)
+        Charty::Vector.new(Numpy.log10(data))
+      end
+
+      def inverse_log_scale(method)
+        Charty::Vector.new(Numpy.power(10, data))
       end
     end
   end

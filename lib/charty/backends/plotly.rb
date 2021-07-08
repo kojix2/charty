@@ -134,10 +134,8 @@ module Charty
 
         if orient == :v
           x, y = bar_pos, values
-          x = group_names unless group_names.nil?
         else
           x, y = values, bar_pos
-          y = group_names unless group_names.nil?
         end
 
         trace = {
@@ -241,9 +239,9 @@ module Charty
           }
 
           if orient == :v
-            trace.update(y: values, x: group_keys)
+            trace.update(y: values, x: group_keys.map(&:to_s))
           else
-            trace.update(x: values, y: group_keys)
+            trace.update(x: values, y: group_keys.map(&:to_s))
           end
 
           trace
@@ -613,6 +611,11 @@ module Charty
         end
       end
 
+      def set_title(title)
+        @layout[:title] ||= {}
+        @layout[:title][:text] = title
+      end
+
       def set_xlabel(label)
         @layout[:xaxis] ||= {}
         @layout[:xaxis][:title] = label
@@ -655,6 +658,29 @@ module Charty
       def set_ylim(min, max)
         @layout[:yaxis] ||= {}
         @layout[:yaxis][:range] = [min, max]
+      end
+
+      def set_xscale(scale)
+        scale = check_scale_type(scale, :xscale)
+        @layout[:xaxis] ||= {}
+        @layout[:xaxis][:type] = scale
+      end
+
+      def set_yscale(scale)
+        scale = check_scale_type(scale, :yscale)
+        @layout[:yaxis] ||= {}
+        @layout[:yaxis][:type] = scale
+      end
+
+      private def check_scale_type(val, name)
+        case
+        when :linear, :log
+          val
+        else
+          raise ArgumentError,
+                "Invalid #{name} type: %p" % val,
+                caller
+        end
       end
 
       def disable_xaxis_grid

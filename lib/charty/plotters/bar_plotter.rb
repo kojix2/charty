@@ -42,6 +42,12 @@ module Charty
         @cap_size = check_number(cap_size, :cap_size, allow_nil: true)
       end
 
+      attr_reader :log
+
+      def log=(val)
+        @log = check_boolean(val, :log)
+      end
+
       private def render_plot(backend, **)
         draw_bars(backend)
         annotate_axes(backend)
@@ -77,6 +83,39 @@ module Charty
             end
             backend.bar(pos, @group_names, @estimations[i], colors, orient,
                         label: color_name, width: width, **ci_params)
+          end
+        end
+      end
+
+      private def annotate_axes(backend)
+        super
+
+        if self.log
+          min_value, max_value = @estimations.minmax
+          if @plot_colors
+            unless @conf_int.empty?
+              min_value = [min_value, @conf_int[0]].min
+              max_value = [max_value, @conf_int[1]].max
+            end
+          else
+            ci_min = Util.filter_map(@conf_int) { |ci| ci[0] unless ci.empty? }
+            ci_max = Util.filter_map(@conf_int) { |ci| ci[1] unless ci.empty? }
+            min_value = [min_value, ci_min.min].min unless ci_min.empty?
+            max_value = [max_value, ci_max.max].max unless ci_max.empty?
+          end
+          if min_value > 1
+            min_value = 0
+          else
+            min_value = Math.log10(min_value).floor
+          end
+          max_value = Math.log10(max_value).ceil
+          case self.orient
+          when :v
+            backend.set_yscale(:log)
+            backend.set_ylim(min_value, max_value)
+          else
+            backend.set_xscale(:log)
+            backend.set_xlim(min_value, max_value)
           end
         end
       end

@@ -220,14 +220,16 @@ module Charty
       end
 
       private def annotate_axes(backend)
+        backend.set_title(self.title) if self.title
+
         if univariate?
-          xlabel = self.variables[:x]
-          ylabel = self.variables[:y]
+          xlabel = self.x_label || self.variables[:x]
+          ylabel = self.y_label || self.variables[:y]
           case self.univariate_variable
           when :x
-            ylabel = self.stat.to_s.capitalize
+            ylabel ||= self.stat.to_s.capitalize
           else
-            xlabel = self.stat.to_s.capitalize
+            xlabel ||= self.stat.to_s.capitalize
           end
           backend.set_ylabel(ylabel) if ylabel
           backend.set_xlabel(xlabel) if xlabel

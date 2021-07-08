@@ -23,19 +23,24 @@ module Charty
     # @param cap_size  Width of the caps on error bars.
     # @param dodge  [true,false]  If true, bar position is shifted along the
     #        categorical axis for avoid overlapping when the color-dimension is used.
+    # @param log  [true,false]  Set the value-axis (e.g. Y-axis if orient is :v) to be log scale.
+    # @param x_label [String,Symbol,#to_str,nil]  X-axis label.
+    # @param y_label [String,Symbol,#to_str,nil]  Y-axis label.
+    # @param title [String,Symbol,#to_str,nil]  Title text.
     def bar_plot(x: nil, y: nil, color: nil, data: nil,
                  order: nil, color_order: nil,
                  estimator: :mean, ci: 95, n_boot: 1000, units: nil, random: nil,
                  orient: nil, key_color: nil, palette: nil, saturation: 1r,
                  error_color: [0.26, 0.26, 0.26], error_width: nil, cap_size: nil,
-                 dodge: true, **options, &block)
+                 dodge: true, log: false, x_label: nil, y_label: nil, title: nil,
+                 **options, &block)
       Plotters::BarPlotter.new(
         data: data, variables: { x: x, y: y, color: color },
         order: order, orient: orient,
         estimator: estimator, ci: ci, n_boot: n_boot, units: units, random: random,
         color_order: color_order, key_color: key_color, palette: palette, saturation: saturation,
         error_color: error_color, error_width: error_width, cap_size: cap_size,
-        dodge: dodge,
+        dodge: dodge, log: log, x_label: x_label, y_label: y_label, title: title,
         **options, &block
       )
     end
@@ -43,7 +48,8 @@ module Charty
     def count_plot(x: nil, y: nil, color: nil, data: nil,
                    order: nil, color_order: nil,
                    orient: nil, key_color: nil, palette: nil, saturation: 1r,
-                   dodge: true, **options, &block)
+                   dodge: true, log: false, x_label: nil, y_label: nil, title: nil,
+                   **options, &block)
       case
       when x.nil? && !y.nil?
         x = y
@@ -70,6 +76,9 @@ module Charty
         palette: palette,
         saturation: saturation,
         dodge: dodge,
+        x_label: x_label,
+        y_label: y_label,
+        title: title,
         **options
       ) do |plotter|
         plotter.value_label = "count"
@@ -106,11 +115,15 @@ module Charty
     # @param whisker  Propotion of the IQR past the low and high quartiles to
     #        extend the plot whiskers.  Points outside of this range will be
     #        treated as outliers.
+    # @param x_label [String,Symbol,#to_str,nil]  X-axis label.
+    # @param y_label [String,Symbol,#to_str,nil]  Y-axis label.
+    # @param title [String,Symbol,#to_str,nil]  Title text.
     def box_plot(x: nil, y: nil, color: nil, data: nil,
                  order: nil, color_order: nil,
                  orient: nil, key_color: nil, palette: nil, saturation: 1r,
                  width: 0.8r, dodge: true, flier_size: 5, line_width: nil,
-                 whisker: 1.5, **options, &block)
+                 whisker: 1.5, x_label: nil, y_label: nil, title: nil,
+                 **options, &block)
       Plotters::BoxPlotter.new(
         data: data,
         variables: { x: x, y: y, color: color },
@@ -125,6 +138,9 @@ module Charty
         flier_size: flier_size,
         line_width: line_width,
         whisker: whisker,
+        x_label: x_label,
+        y_label: y_label,
+        title: title,
         **options,
         &block
       )
@@ -164,13 +180,18 @@ module Charty
     #        :full, every group will get an entry in the legend.  If :auto,
     #        choose between brief or full representation based on number of
     #        levels.  If false, no legend data is added and no legend is drawn.
+    # @param x_label [String,Symbol,#to_str,nil]  X-axis label.
+    # @param y_label [String,Symbol,#to_str,nil]  Y-axis label.
+    # @param title [String,Symbol,#to_str,nil]  Title text.
     def line_plot(x: nil, y: nil, color: nil, style: nil, size: nil,
                   data: nil, key_color: nil, palette: nil, color_order: nil,
                   color_norm: nil, sizes: nil, size_order: nil, size_norm: nil,
                   markers: nil, dashes: true, style_order: nil,
                   units: nil, estimator: :mean, n_boot: 1000, random: nil,
                   sort: true, err_style: :band, err_params: nil, error_bar: [:ci, 95],
-                  x_scale: :linear, y_scale: :linear, legend: :auto, **options, &block)
+                  x_scale: :linear, y_scale: :linear, legend: :auto,
+                  x_label: nil, y_label: nil, title: nil,
+                  **options, &block)
       Plotters::LinePlotter.new(
         data: data,
         variables: { x: x, y: y, color: color, style: style, size: size },
@@ -195,6 +216,9 @@ module Charty
         x_scale: x_scale,
         y_scale: y_scale,
         legend: legend,
+        x_label: x_label,
+        y_label: y_label,
+        title: title,
         **options,
         &block
       )
@@ -225,11 +249,14 @@ module Charty
     #        :full, every group will get an entry in the legend.  If :auto,
     #        choose between brief or full representation based on number of
     #        levels.  If false, no legend data is added and no legend is drawn.
+    # @param x_label [String,Symbol,#to_str,nil]  X-axis label.
+    # @param y_label [String,Symbol,#to_str,nil]  Y-axis label.
+    # @param title [String,Symbol,#to_str,nil]  Title text.
     def scatter_plot(x: nil, y: nil, color: nil, style: nil, size: nil,
                      data: nil, key_color: nil, palette: nil, color_order: nil,
                      color_norm: nil, sizes: nil, size_order: nil, size_norm: nil,
                      markers: true, style_order: nil, alpha: nil, legend: :auto,
-                     **options, &block)
+                     x_label: nil, y_label: nil, title: nil, **options, &block)
       Plotters::ScatterPlotter.new(
         data: data,
         variables: { x: x, y: y, color: color, style: style, size: size },
@@ -244,6 +271,9 @@ module Charty
         style_order: style_order,
         alpha: alpha,
         legend: legend,
+        x_label: x_label,
+        y_label: y_label,
+        title: title,
         **options,
         &block
       )
@@ -253,7 +283,8 @@ module Charty
                   stat: :count, bins: :auto,
                   bin_range: nil, common_bins: true,
                   key_color: nil, palette: nil, color_order: nil, color_norm: nil,
-                  legend: true, **options, &block)
+                  legend: true, x_label: nil, y_label: nil, title: nil,
+                  **options, &block)
       # TODO: support following arguments
       # - wiehgts
       # - binwidth
@@ -287,6 +318,9 @@ module Charty
         color_order: color_order,
         color_norm: color_norm,
         legend: legend,
+        x_label: x_label,
+        y_label: y_label,
+        title: title,
         **options,
         &block)
     end
